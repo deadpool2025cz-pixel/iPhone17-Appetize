@@ -1,0 +1,45 @@
+name: Build Appetize iOS Simulator
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build iOS Simulator app
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project iPhone17Demo.xcodeproj \
+            -scheme iPhone17Demo \
+            -sdk iphonesimulator \
+            -configuration Release \
+            -derivedDataPath "$PWD/build" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            build | tee xcodebuild.log
+
+      - name: Package for Appetize
+        run: |
+          cd build/Build/Products/Release-iphonesimulator
+          ditto -c -k --sequesterRsrc --keepParent iPhone17Demo.app "$GITHUB_WORKSPACE/iPhone17Demo-Appetize.zip"
+
+      - name: Upload Appetize build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iPhone17Demo-Appetize
+          path: iPhone17Demo-Appetize.zip
+          if-no-files-found: error
