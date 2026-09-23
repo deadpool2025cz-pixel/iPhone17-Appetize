@@ -12,6 +12,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Fix source syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('iPhone17Demo/App.swift')
+          s = p.read_text()
+          s = s.replace('Button{} label:{Circle().stroke(.white,lineWidth:5).frame(width:76,height:76).overlay(Circle().fill(.white).padding(7))}', 'Button(action: {}) { Circle().stroke(.white,lineWidth:5).frame(width:76,height:76).overlay(Circle().fill(.white).padding(7)) }')
+          p.write_text(s)
+          PY
+
       - name: Install XcodeGen
         run: brew install xcodegen
 
