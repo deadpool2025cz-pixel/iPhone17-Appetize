@@ -18,6 +18,7 @@ jobs:
           from pathlib import Path
           p = Path('iPhone17Demo/App.swift')
           s = p.read_text()
+          s = s.replace('Button{flash.toggle()}{Image(systemName:flash ? "bolt.fill":"bolt.slash.fill")}', 'Button(action: { flash.toggle() }) { Image(systemName: flash ? "bolt.fill" : "bolt.slash.fill") }')
           s = s.replace('Button{} label:{Circle().stroke(.white,lineWidth:5).frame(width:76,height:76).overlay(Circle().fill(.white).padding(7))}', 'Button(action: {}) { Circle().stroke(.white,lineWidth:5).frame(width:76,height:76).overlay(Circle().fill(.white).padding(7)) }')
           p.write_text(s)
           PY
